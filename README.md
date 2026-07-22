@@ -116,3 +116,80 @@ Factory Reset (bootstrap --reset): Running the script with the --reset flag will
 
 
 
+
+# Vanguard Reserve Bank (VRB) - Pocket POS v5
+
+## Overview
+
+The **Pocket Point-of-Sale (POS)** terminal is an application designed to run on an Advanced Ender Pocket Computer in Minecraft using CC:Tweaked. It enables shopkeepers to manage customer orders on the go, track local tabs, and bill customers directly through the Vanguard Reserve Bank network.
+
+---
+
+## Features & Capabilities
+
+* **Local Tab Management:** Open, update, and manage multiple customer tabs locally on the pocket computer disk (`/.vrb/tabs.dat`). Tabs survive reboots.
+
+
+* **Secure RPC Communication:** Utilizes the same cryptographic standards (`VRB_V2` protocol, HMAC, and AES-like stream cipher) as the main bank infrastructure to securely send payment requests.
+
+
+* **Shopkeeper Authentication:** Requires a shopkeeper username and 4-digit PIN authenticated via the bank server (`auth_by_owner`) before transactions can be processed.
+
+
+* **Flexible Line Item Entry:** Supports multiple syntax styles for adding items and prices (e.g., `add burger 8`, `+ fries 4`, or price-first formats).
+
+
+* **Scrollable Interface:** Navigate long customer orders smoothly using mouse scroll wheels or keyboard shortcuts.
+
+
+
+---
+
+## Installation & First-Time Setup
+
+1. **Hardware Requirement:** Ensure your Advanced Ender Pocket Computer has a wireless or ender modem attached.
+
+
+2. **Pairing:** On first boot, if no server secret key is found, the device will prompt you to pair with an admin terminal using a generated 6-digit code or via manual paste of the `server.secret`.
+
+
+3. **Sign-In:** Enter your shopkeeper username and 4-digit PIN. If it is your first time signing in on this device, you will be prompted to name your shop.
+
+
+
+---
+
+## Command Reference
+
+| Command | Description |
+| --- | --- |
+| `tab <name>` | Switch to or create a customer tab
+
+ |
+| `add <name> <price>` or `+ <name> <price>` | Add a line item and price to the active tab
+
+ |
+| `void <name>` | Remove one quantity of an item from the active tab
+
+ |
+| `tabs` | List all currently open tabs and their totals
+
+ |
+| `close` or `bill` | Finalize the active tab and send a payment request bill to the customer
+
+ |
+| `delete <name>` | Drop a tab entirely without billing
+
+ |
+| `scroll u/d` | Page up or down through long item lists
+
+ |
+| `out` or `signout` | Sign out of the current shopkeeper session
+
+ |
+| `q`, `quit`, or `exit` | Exit the application (tabs persist on local disk)
+
+ |
+| `?` or `help` | Display command help
+
+ |
