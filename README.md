@@ -55,62 +55,6 @@ The Vanguard Reserve Bank (VRB) is a highly sophisticated, single-file banking a
 Deployment Workflow
 The script automatically detects the state of your network and adjusts its installation process accordingly.
 
-1. First-Time Setup (The Bank Server)
-If the script detects no existing cryptographic keys, it assumes this is the primary bank server.
-
-Download: Retrieves the monolithic vrb.lua script from Pastebin.
-
-Keygen: Generates fresh, secure cryptographic keys (server.secret and admin.key).
-
-Distribution Floppy: Writes these keys to a blank in-game floppy disk.
-
-Initialization: Installs the computer as the server role, writes the startup file, and reboots.
-
-IMPORTANT: The script will pause and force the server administrator to physically write down the generated keys on real-life paper. If the server is destroyed in-game and the keys are lost, the bank's database cannot be recovered.
-
-2. Follow-Up Setup (Network Nodes)
-If the script detects an existing deployment (via the insertion of the distribution floppy), it will configure the computer to join the VRB network.
-
-Sneakernet Security: Reads the server.secret (and admin.key if applicable) from the physical distribution floppy, ensuring keys are never transmitted over easily intercepted wireless modems.
-
-Role Selection: Prompts the user to assign a specific function to the computer.
-
-Initialization: Copies the appropriate keys, writes the startup file, and reboots.
-
-Available Node Roles
-When setting up a follow-up computer, the bootstrap script allows you to configure it as one of the following:
-
-[1] atm: Branch ATM - Touchscreen interface for players to access Checking/Savings accounts.
-
-[2] admin: Vanguard Staff Terminal - Highly privileged terminal for managing the treasury, taxes, and payroll.
-
-[3] scoreboard: Earnings Reader - Interfaces with a Command Computer to track player stats for activity-based pay.
-
-[4] viewer: Public Economy Dashboard - Read-only display of market stats and the money supply.
-
-[5] mint: Reserve Note Station - Kiosk for exchanging physical Minecraft items for digital currency.
-
-[6] shop: Player-Run Vending Kiosk - Storefront connected to faction/corporate multi-signature accounts.
-
-Troubleshooting & Emergency Commands
-Partial Setup Recovery: If a server setup is interrupted before the startup file is written, the script will automatically detect the orphaned keys and offer to rebuild the distribution floppy without wiping the existing keypair.
-
-Factory Reset (bootstrap --reset): Running the script with the --reset flag will destructively wipe the local /.vrb directory, keys, and startup files. Use this only if you intend to completely wipe a node or bank server.
-"""
-
-with open("vrb_bootstrap_readme.md", "w") as f:
-f.write(content)
-
-generate_bootstrap_readme()
-
-
-Your markdown file is ready.
-[file-tag: code-generated-file-83335951-2e52-4fb7-9c27-d30e4e6102c0]
-
-The README has been formatted using clear headings, bullet points, and horizontal rules for scannability. It details the installation process, the dual-phase deployment workflow (Server vs. Follow-up Nodes), all available roles mapping directly to the Lua script's functions, and the required security procedures.
-
-There is a file you can reference named "vrb_bootstrap_readme.md". Refer to this file by its name verbatim.
-[source: 1]# Vanguard Reserve Bank (VRB) - Bootstrap Script v9.0
 
 ## Overview
 This bootstrap script is the automated deployment and installation utility for the Vanguard Reserve Bank (VRB) system on CC:Tweaked in Minecraft. Because the main VRB system is a complex, monolithic script requiring strict cryptographic security, this bootstrap utility ensures a foolproof, streamlined installation process across multiple in-game computers in under 60 seconds per node.
