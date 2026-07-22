@@ -1,7 +1,7 @@
 # Vanguard Reserve Bank (VRB) - Version 9.0.0
 
 ## Important Note on Code Formatting
-If you are reviewing the source code, you will notice it is formatted as an ugly, monolithic, and completely commentless file. This was not the original design. At the time of development, ArchdukePierre realized that the script had completely maxed out the internal storage and memory capacity of the CC:Tweaked computer. To fit the banking system into the computer and ensure it would not crash the Minecraft world or cause severe lag, all comments and formatting had to be cut out. It was not like this at conception, but was aggressively minimized out of absolute necessity.
+If you are reviewing the source code, you will notice it is formatted as an ugly, monolithic, and completely commentless file. This was not the original design. At the time of development, I realized that the script had completely maxed out the internal storage and memory capacity of the CC:Tweaked computer. To fit the banking system into the computer and ensure it would not crash the Minecraft world or cause severe lag, all comments and formatting had to be cut out. It was not like this at conception, but was aggressively minimized out of absolute necessity.
 
 ## Overview
 The Vanguard Reserve Bank (VRB) is a highly sophisticated, single-file banking and economic system built for ComputerCraft / CC:Tweaked in Minecraft. Operating on protocol `VRB_V2`, it functions as a comprehensive central reserve bank, processing secure transactions, managing financial accounts, and driving a dynamic, action-based player economy.
