@@ -1,195 +1,185 @@
-# Vanguard Reserve Bank (VRB) - Version 9.0.0
+# Vanguard Reserve Bank
 
-## Important Note on Code Formatting
-If you are reviewing the source code, you will notice it is formatted as an ugly, monolithic, and completely commentless file. This was not the original design. At the time of development, I realized that the script had completely maxed out the internal storage and memory capacity of the CC:Tweaked computer. To fit the banking system into the computer and ensure it would not crash the Minecraft world or cause severe lag, all comments and formatting had to be cut out. It was not like this at conception, but was aggressively minimized out of absolute necessity.
+A bank and economy system for ComputerCraft: Tweaked servers. Version 10.0.0.
 
-## Overview
-The Vanguard Reserve Bank (VRB) is a highly sophisticated, single-file banking and economic system built for ComputerCraft / CC:Tweaked in Minecraft. Operating on protocol `VRB_V2`, it functions as a comprehensive central reserve bank, processing secure transactions, managing financial accounts, and driving a dynamic, action-based player economy.
+One computer runs the bank and holds every account. ATMs, staff terminals, shop kiosks, a public dashboard, a pocket point of sale and an earnings reader are clients that talk to it over modems.
 
-## Core Features
+Version 10 is a rewrite of version 9. It removes the main sources of load that made version 9 lag a busy server, installs with one command and pairs computers with a code. Data from version 9 is imported on the first start.
 
-### 1. Robust Account System
-*   **Checking & Savings:** Players can open paired checking and savings accounts.
-*   **Security:** Uses strict PIN hashing (HMAC-SHA256) with lockout mechanisms to prevent brute-force attacks (5 failed attempts locks the account for 15 minutes).
-*   **Treasury & Reserve:** Dedicated treasury accounts ("VanguardFed") for taxation, supply tracking, and system payouts.
+The code was tested in a headless model of CC:Tweaked (see Tests), not in a running game. Run `vrb doctor` after installing, and `vrb scoreboard_test` once on the Command Computer.
 
-### 2. Custom Cryptography & Security
-*   **Built-in Crypto:** Includes pure Lua implementations of SHA-256 and HMAC algorithms.
-*   **Secure RPC:** Implements nonces, timestamp windows, stream XOR encryption, and MAC verification for secure remote procedure calls (RPC) over rednet to prevent packet spoofing and replay attacks.
-*   **Randomization:** Seeds a custom random number generator using system time, computer ID, and hashing.
+## Install
 
-### 3. Economic & Monetary Policy
-*   **Interest Rates:** Automated interest accrual for savings, checking, CDs, and loans.
-*   **Taxation:** Progressive income tax brackets ranging from 0% to 10% based on earnings, alongside transaction taxes.
-*   **Universal Basic Income (UBI):** Optional system to distribute weekly stipends to active citizens.
-*   **Money Supply Management:** Features supply targets to dynamically adjust top tax brackets if the money supply inflates or deflates past specific thresholds.
-*   **Item Backing:** The currency can be backed by physical commodities like Diamonds, Netherite, Gold, and Emeralds at fixed rates.
+You need HTTP enabled in the CC:Tweaked config (`http.enabled`). On each computer run:
 
-### 4. Player Earnings & Progress System
-*   **Activity-Based Pay:** Players earn a survival wage supplemented by specific in-game actions:
-    *   **Combat Pay:** Bounties for killing hostile mobs (tiered by difficulty) and massive payouts for bosses (Ender Dragon, Wither).
-    *   **Exploration Bonus:** Payouts based on blocks traveled, with multipliers for exploring the Nether or End.
-    *   **Builder Bonus:** Rewards for placing structural blocks.
-    *   **Danger Pay:** Compensation for taking damage and surviving.
-*   **Streak Mechanics:** Daily login and activity streaks multiply base earnings (up to 2.5x for a "Veteran" 365-day streak).
-*   **Death Penalty & Insurance:** Dying drops the player's streak tier. Players can purchase death insurance to mitigate the streak loss.
-*   **Progress Catalog:** Bounties for one-time milestones (first diamond, entering the Nether, registering a base, etc.).
+```
+wget run https://raw.githubusercontent.com/ArchdukePierre/VanguardReserveBank/main/install.lua
+```
 
-### 5. Vanguard Ranks & Civic Jobs
-*   **Military Payroll:** Fully integrated payroll system for the "Vanguard" military structure, ranging from Enlisted (E-1) to General (O-10), with weekly automated payouts.
-*   **Civic Payroll:** Support for civilian government jobs with annual salaries translated to daily payouts.
+The installer asks what the computer is for, downloads only the files that role needs, and reboots into it.
 
-### 6. Factions & Multisig Transactions
-*   **Corporate/Faction Accounts:** Groups can form factions with shared treasury accounts.
-*   **Multisignature Approvals:** Large transfers from faction accounts require multisig approval from a configurable threshold of members, generating network notifications for pending votes.
+1. Start with the bank server. Use an Advanced Computer with a wireless or ender modem. Pick **Bank server**. It makes the keys and asks for a network name.
+2. After the reboot the server screen shows its status. Press **P** to open pairing. It shows a code like `7QK4-M2XH-9TBD`.
+3. On every other computer run the installer, pick the role, and type the code. Press **S** instead of **P** on the server for a staff code, which also gives the computer the admin key. Staff terminals, the mint and the earnings reader need one.
 
-### 7. Ledger & Data Integrity
-*   **Immutable Ledger:** Every transaction, error, and system event is appended to a hashed ledger (`ledger.log`), creating a blockchain-lite chain of custody to detect tampering.
-*   **Auto-Maintenance:** The system actively monitors disk space, performing automatic log rotation, archive pruning, and rolling backups to prevent the CC:Tweaked computer from running out of space and corrupting the database.
+A floppy disk also works. Press **F** on the server to write the keys to a disk in a drive, and the installer on the new computer reads them from it.
 
-## System Requirements
-*   A CC:Tweaked Advanced Computer or Server.
-*   An attached Wireless or Ender Modem for secure RPC communication.
-*   Sufficient disk space for the rolling JSON database and cryptographic ledger.
+### Computers
 
-Deployment Workflow
-The script automatically detects the state of your network and adjusts its installation process accordingly.
+| Role | Hardware | What it does |
+| --- | --- | --- |
+| Bank server | Advanced Computer, wireless or ender modem | Holds accounts, runs interest, payroll and the ledger |
+| ATM | Computer, modem, Advanced Monitor (3x3 works well) | Customer screen: pay, bill, savings, loans, factions, shops and more |
+| Staff terminal | As an ATM, plus a staff code | Accounts, policy, payroll, review queue, ledger, diagnostics |
+| Public dashboard | Computer, modem, monitor | Money supply, rates, tax brackets and a feed of public events |
+| Shop kiosk | As an ATM, optional chests | Sells one player shop's stock and can dispense it |
+| Mint station | Staff computer, disk drive or printer | Issues physical Reserve Notes |
+| Pocket POS | Advanced Pocket Computer with a modem | Shopkeeper tabs and billing |
+| Earnings reader | Command Computer, staff code | Reads player statistics, pays earnings and salaries, delivers in-game messages |
 
+## The server screen
 
-## Overview
-This bootstrap script is the automated deployment and installation utility for the Vanguard Reserve Bank (VRB) system on CC:Tweaked in Minecraft. Because the main VRB system is a complex, monolithic script requiring strict cryptographic security, this bootstrap utility ensures a foolproof, streamlined installation process across multiple in-game computers in under 60 seconds per node.
-
----
-
-## Installation & Usage
-
-To install the VRB system on a new CC:Tweaked computer, run the following commands in the in-game terminal:
-
-pastebin get YOUR_BOOTSTRAP_CODE bootstrap
-bootstrap
-(Note: You must edit the PASTEBIN_VRB_LUA variable in the script to match your specific pastebin upload before deploying.)
-
-Deployment Workflow
-The script automatically detects the state of your network and adjusts its installation process accordingly.
-
-1. First-Time Setup (The Bank Server)
-If the script detects no existing cryptographic keys, it assumes this is the primary bank server.
-
-Download: Retrieves the monolithic vrb.lua script from Pastebin.
-
-Keygen: Generates fresh, secure cryptographic keys (server.secret and admin.key).
-
-Distribution Floppy: Writes these keys to a blank in-game floppy disk.
-
-Initialization: Installs the computer as the server role, writes the startup file, and reboots.
-
-IMPORTANT: The script will pause and force the server administrator to physically write down the generated keys on real-life paper. If the server is destroyed in-game and the keys are lost, the bank's database cannot be recovered.
-
-2. Follow-Up Setup (Network Nodes)
-If the script detects an existing deployment (via the insertion of the distribution floppy), it will configure the computer to join the VRB network.
-
-Sneakernet Security: Reads the server.secret (and admin.key if applicable) from the physical distribution floppy, ensuring keys are never transmitted over easily intercepted wireless modems.
-
-Role Selection: Prompts the user to assign a specific function to the computer.
-
-Initialization: Copies the appropriate keys, writes the startup file, and reboots.
-
-Available Node Roles
-When setting up a follow-up computer, the bootstrap script allows you to configure it as one of the following:
-
-[1] atm: Branch ATM - Touchscreen interface for players to access Checking/Savings accounts.
-
-[2] admin: Vanguard Staff Terminal - Highly privileged terminal for managing the treasury, taxes, and payroll.
-
-[3] scoreboard: Earnings Reader - Interfaces with a Command Computer to track player stats for activity-based pay.
-
-[4] viewer: Public Economy Dashboard - Read-only display of market stats and the money supply.
-
-[5] mint: Reserve Note Station - Kiosk for exchanging physical Minecraft items for digital currency.
-
-[6] shop: Player-Run Vending Kiosk - Storefront connected to faction/corporate multi-signature accounts.
-
-Troubleshooting & Emergency Commands
-Partial Setup Recovery: If a server setup is interrupted before the startup file is written, the script will automatically detect the orphaned keys and offer to rebuild the distribution floppy without wiping the existing keypair.
-
-Factory Reset (bootstrap --reset): Running the script with the --reset flag will destructively wipe the local /.vrb directory, keys, and startup files. Use this only if you intend to completely wipe a node or bank server.
-
-
-
-
-# Vanguard Reserve Bank (VRB) - Pocket POS v5
-
-## Overview
-
-The **Pocket Point-of-Sale (POS)** terminal is an application designed to run on an Advanced Ender Pocket Computer in Minecraft using CC:Tweaked. It enables shopkeepers to manage customer orders on the go, track local tabs, and bill customers directly through the Vanguard Reserve Bank network.
-
----
-
-## Features & Capabilities
-
-* **Local Tab Management:** Open, update, and manage multiple customer tabs locally on the pocket computer disk (`/.vrb/tabs.dat`). Tabs survive reboots.
-
-
-* **Secure RPC Communication:** Utilizes the same cryptographic standards (`VRB_V2` protocol, HMAC, and AES-like stream cipher) as the main bank infrastructure to securely send payment requests.
-
-
-* **Shopkeeper Authentication:** Requires a shopkeeper username and 4-digit PIN authenticated via the bank server (`auth_by_owner`) before transactions can be processed.
-
-
-* **Flexible Line Item Entry:** Supports multiple syntax styles for adding items and prices (e.g., `add burger 8`, `+ fries 4`, or price-first formats).
-
-
-* **Scrollable Interface:** Navigate long customer orders smoothly using mouse scroll wheels or keyboard shortcuts.
-
-
-
----
-
-## Installation & First-Time Setup
-
-1. **Hardware Requirement:** Ensure your Advanced Ender Pocket Computer has a wireless or ender modem attached.
-
-
-2. **Pairing:** On first boot, if no server secret key is found, the device will prompt you to pair with an admin terminal using a generated 6-digit code or via manual paste of the `server.secret`.
-
-
-3. **Sign-In:** Enter your shopkeeper username and 4-digit PIN. If it is your first time signing in on this device, you will be prompted to name your shop.
-
-
-
----
-
-## Command Reference
-
-| Command | Description |
+| Key | Action |
 | --- | --- |
-| `tab <name>` | Switch to or create a customer tab
+| P | Open pairing for a normal computer |
+| S | Open pairing for a staff computer |
+| F | Write the keys, including the admin key, to a floppy disk |
+| B | Back up the data to `/.vrb/backups` |
+| V | Verify the whole ledger |
+| A | Audit every account against its recorded entries |
+| Q | Stop the server |
 
- |
-| `add <name> <price>` or `+ <name> <price>` | Add a line item and price to the active tab
+## Commands
 
- |
-| `void <name>` | Remove one quantity of an item from the active tab
+Run `vrb` in the shell of any installed computer.
 
- |
-| `tabs` | List all currently open tabs and their totals
+| Command | What it does |
+| --- | --- |
+| `vrb status` | Role, network, keys, modem, disk, and whether the bank answers |
+| `vrb doctor` | Checks everything and says what to fix. On the server it also audits the accounts and verifies the ledger |
+| `vrb update` | Downloads the latest files for this computer's role and reboots |
+| `vrb join [staff]` | Pair with a code or a floppy |
+| `vrb floppy [staff]` | Write keys to a disk (server only) |
+| `vrb config` | Show, get, set and unset settings |
+| `vrb backup`, `vrb restore <name>` | Back up or restore the bank data. Stop the server first |
+| `vrb keys` | Print the keys for a paper copy |
+| `vrb reset` | Delete the keys and data on this computer |
 
- |
-| `close` or `bill` | Finalize the active tab and send a payment request bill to the customer
+## Updating
 
- |
-| `delete <name>` | Drop a tab entirely without billing
+Run `vrb update` on every computer. The server and the clients must run the same major version. Keys, data and settings are kept.
 
- |
-| `scroll u/d` | Page up or down through long item lists
+## Moving from version 9
 
- |
-| `out` or `signout` | Sign out of the current shopkeeper session
+Install version 10 on the server computer with the installer. Keep the existing `/.vrb` folder. On the first start the server finds `/.vrb/bank.db`, imports accounts, PINs, savings, certificates, loans, factions, shops, notes, earnings, ranks and jobs, and moves the old database and ledger to `/.vrb/legacy`. The old `server.secret` and `admin.key` keep working, so PINs and Reserve Notes stay valid.
 
- |
-| `q`, `quit`, or `exit` | Exit the application (tabs persist on local disk)
+Then run the installer on every ATM, terminal and kiosk. They need the new files. They also need the keys again only if they were wiped.
 
- |
-| `?` or `help` | Display command help
+Delete `/.vrb/legacy` once you are satisfied. It is the old database and can be large.
 
- |
+Things that behave differently from version 9:
+
+- Interest is posted once a day instead of every hour, as one summary ledger line plus one history line per account.
+- Vanguard and civic pay stops while a member is on leave.
+- Income tax brackets are one list. The supply target moves the top of that list.
+- Account history keeps 20 entries per account by default. The ledger holds the long record.
+- `admin_rotate_secret` is gone. Changing the network key now means re-pairing computers. PIN hashes and Reserve Note signatures use a separate key stored in the database, so they survive.
+- Admin and server calls were renamed where they were duplicated. `docs/PROTOCOL.md` lists every call.
+
+## ATM item deposits
+
+The ATM shows DEPOSIT ITEMS only when it is told which two chests to use. Run these on the ATM computer, with the chest names from `peripheral.getNames()`:
+
+```
+set vrb.atm.drop <chest players put items in>
+set vrb.atm.bank <chest the bank keeps them in>
+```
+
+The ATM credits only what it moved into the bank chest and puts the items back if the bank refuses the deposit. The backed items and their values are set in the staff terminal.
+
+## Trust
+
+Every computer that holds `server.secret` can talk to the bank, and the staff computers can also change anything. The server cannot check what an ATM claims to have received in a chest or what a shop kiosk dispensed. Keep the computers and chests of ATMs and kiosks where players cannot get at them, and give the staff code only to staff.
+
+## Settings
+
+Defaults are in `vrb/lib/defaults.lua`. Overrides live in `/.vrb/config` and are managed with `vrb config`:
+
+```
+vrb config set net.network myserver
+vrb config set server.history_depth 30
+vrb config set earnings.daily_tick_hour 3
+```
+
+Economy values such as rates, tax and UBI are changed from the staff terminal and stored in the database.
+
+## Disk space
+
+CC:Tweaked gives a computer 1,000,000 bytes by default (`computer_space_limit` in the server config). The server watches it.
+
+With 150 players (301 accounts) the data was 377 KB: 123 KB of snapshots, the ledger and a journal of up to 64 KB. The server's program files are about 234 KB, an ATM's about 197 KB and the smaller clients' 113 to 199 KB. Version 9 put 387 KB on every computer. If you expect more players, raise `computer_space_limit`. History depth, ledger size and backup count are settings under `server`.
+
+When free space falls under 32 KB the server pauses writes, keeps answering reads and shows a warning on the staff terminal. It does not delete anything to make room.
+
+## Troubleshooting
+
+Run `vrb doctor` first. It names the problem on most computers.
+
+- **Clients say the bank is not responding.** Check that the server screen is up, that both modems are active (a wireless modem has a 64 block range, an ender modem has none) and that `vrb config get net.network` matches on both computers.
+- **A staff terminal says the admin key does not match.** The computer was paired with a normal code. Run `vrb join staff` with a staff code, or `vrb keys` on the server and copy the key.
+- **Changes are paused.** The server disk is nearly full. Delete `/.vrb/legacy`, delete old files in `/.vrb/backups`, or raise `computer_space_limit`.
+- **A player is locked out.** Five wrong PINs lock an account for 15 minutes. Staff can unlock it in the accounts screen.
+- **The ledger check fails.** Something edited the ledger files or the disk was damaged. Keep `/.vrb/data/ledger.log` and `/.vrb/data/ledger/` as they are and compare with a backup. Account balances do not depend on the ledger.
+- **The server stopped.** `startup.lua` restarts it after 8 seconds. On the next start it replays the journal and repairs the ledger from it.
+- **The earnings reader pays nothing.** Run `vrb scoreboard_test` on the Command Computer and look at the raw command output it prints.
+
+## What was wrong with version 9
+
+Measured in the test model in `tests/` with 150 accounts:
+
+| | Version 9 | Version 10 |
+| --- | --- | --- |
+| Disk written per transfer | 169,716 bytes | 2,458 bytes, snapshot compaction included |
+| VM instructions per transfer | 820,000 | 180,000 |
+| Disk written to open 150 accounts | 28.7 MB | 0.5 MB |
+| Monitor writes on an idle ATM | a full redraw twice a second | none |
+
+The causes:
+
+- Every change rewrote the whole database, history included, and then replaced the file. The cost grew with every account. When the disk filled up, each failed save ran a cleanup that deleted backups and ledger archives and then waited half a second inside the request handler.
+- Every ATM and shop kiosk redrew its whole monitor twice a second even when nobody touched it. That keeps the monitor changing, so the server keeps sending terminal updates to every nearby player.
+- The ledger was opened, hashed and appended once per entry. Several calls read and parsed the whole ledger. Dashboards polled two of them every 10 seconds.
+- A retried request ran again. A transfer whose reply was lost could pay twice.
+- The earnings reader sent about 100 server commands per player to objectives the code never created.
+- The program was one 387 KB file that every computer loaded, including ATMs.
+
+## Tests
+
+The tests run the program itself in a headless model of CC:Tweaked (`tests/cc.lua`) with a 1 MB disk, timers, modems and monitors. You need Python and the `lupa` package:
+
+```
+pip install lupa
+python tests/run.py tests/test_server.lua
+python tests/run_all.py
+```
+
+| Test | Covers |
+| --- | --- |
+| `test_crypto.lua` | SHA-256, HMAC and cipher against published vectors, v9 PIN hash compatibility |
+| `test_store.lua` | Journal replay, torn writes, interrupted compaction, ledger tamper detection, rotation, recovery, full disk |
+| `test_server.lua` | Sign in, payments, tax, savings, bills, lockout, admin signing, restart |
+| `test_economy.lua` | Certificates, loans, interest, factions, escrow, shops, notes, earnings, payroll, work orders |
+| `test_resilience.lua` | Concurrent clients, flooding, replays, retried requests, full disk |
+| `test_migrate.lua` | Importing a database made by the version 9 server |
+| `test_pairing.lua`, `test_install.lua` | Pairing codes, the installer and first boot |
+| `test_idle.lua`, `test_tools.lua` | Idle cost of the server, `vrb doctor`, `config`, `backup`, `restore`, `reset` |
+| `test_ui.lua` | The screen toolkit and an idle monitor |
+| `test_atm.lua`, `test_admin.lua`, `test_viewer.lua`, `test_shop.lua`, `test_mint.lua`, `test_pos.lua`, `test_scoreboard.lua` | Each program, driven with touch, keyboard and the mocked chests, disks, printers and Command Computer |
+
+`tests/bench_new.lua <accounts> <transfers>` gives the new numbers. For the old ones extract the version 9 program with `git show a8005c1:VanguardReserveBank.lua > old.lua` and run `python tests/run.py tests/bench_old.lua old.lua <accounts> <transfers>`. `tools/make_manifest.py` rewrites `manifest.lua` and must run before a release. `tools/gen_protocol.lua` rewrites `docs/PROTOCOL.md`.
+
+More detail is in `docs/ARCHITECTURE.md`, `docs/PROTOCOL.md` and `docs/UI.md`.
+
+## License
+
+MIT. See `LICENSE`.
